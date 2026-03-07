@@ -4,25 +4,67 @@
 
 > An automated data science and web scraping pipeline that measures the real perceived value of PC hardware over time by cross-referencing raw GPU benchmarks, inflation-adjusted MSRPs, and the escalating system requirements of AAA games.
 
-## 📖 1. About
-**Performance Inflation** is an analytical tool built to answer a recurring question in the PC gaming community: *"Is hardware getting more expensive, or are games just getting heavier?"* Instead of relying on nostalgia or hardware marketing, this script autonomously fetches real-world data from multiple APIs and databases (RAWG, PassMark, TechPowerUp) to build a historical timeline. It calculates how the actual "perceived performance" of mid-range GPUs (like the NVIDIA 60-Series) degrades as game engine requirements inflate, while tracking the economic value of the silicon itself.
+## 📖 About
+**Performance Inflation** is an analytical tool built to answer a recurring question in the PC gaming community: *"Is hardware getting more expensive, or are games just getting heavier?"* Instead of relying on nostalgia or hardware marketing, this script autonomously fetches real-world data from multiple APIs and databases (RAWG, PassMark, TechPowerUp) to build a historical timeline. It estimates the **effective gaming headroom** of a GPU generation by penalizing raw benchmark power with the rising system requirements of modern AAA titles.
 
 ---
 
-## 📸 2. Dashboard Preview
+## 📸 Dashboard Preview
 
-<img width="1120" height="952" alt="Figure_1" src="https://github.com/user-attachments/assets/13aea735-f715-46d7-ac8f-c4d071ae26a3" />
+<img width="1200" height="1100" alt="Figure_2" src="https://github.com/user-attachments/assets/a9101b69-b528-4a3c-b394-2a415af27374" />
 
 
 ---
 
-## 📊 3. Chart Lines Breakdown
+## 🎯 Core Thesis — Demand-Adjusted Performance
+
+The central idea behind this project is the **Demand-Adjusted Performance** metric, represented by the **Orange Circle** in the top chart.
+
+* **Orange Circle (Demand-Adjusted Performance):** The effective power of a GPU once the increasing computational demand of modern AAA game engines is taken into account. If this line trends downward across generations, it means that although GPUs are becoming faster in absolute terms, they provide **less long-term graphical headroom** for running contemporary games.
+
+*(The detailed mathematical formulation for this metric is explained in the **Mathematics** section.)*
+
+### Why this metric matters
+
+Most gamers do not upgrade their GPU to dramatically increase visual quality. In practice, upgrades are often performed to **maintain roughly the same experience** — for example, continuing to run new AAA releases at similar graphics settings and framerates as previous generations.
+
+In other words, hardware upgrades are frequently used to **preserve a performance baseline**, not necessarily to raise it.
+
+This creates an important question:
+
+> *Are GPUs actually improving the player's long-term ability to run new games, or are game engines consuming performance faster than hardware evolves?*
+
+The **Demand-Adjusted Performance** metric attempts to quantify this relationship.
+
+By penalizing the raw benchmark score of a GPU with the increasing average hardware requirements of modern AAA titles, the model estimates the **effective performance headroom** that a new generation provides relative to the previous one.
+
+### What the data suggests
+
+The dataset shows a clear pattern:
+
+- **Raw GPU power increases dramatically across generations.**
+- **Performance per dollar also improves significantly.**
+- However, **Demand-Adjusted Performance grows much more slowly and even declines after certain generations.**
+
+This indicates that while silicon manufacturing and GPU architectures continue to improve, 
+
+> ***but Game engines and graphical expectations are absorbing a large portion of the performance gains delivered by modern GPUs.***
+
+The result is a subtle but noticeable phenomenon experienced by many PC gamers:
+
+> New GPUs are objectively faster, but they often provide **less long-term breathing room** for future games than earlier generations did.
+
+This project attempts to make that phenomenon measurable.
+
+---
+
+## 📊 Chart Lines Breakdown
 The generated dashboard contains two subplots to separate the graphical narrative from the economic narrative:
 
 **Top Chart: Performance vs. Game Engine Demand**
 * **Cyan Triangle (Raw Hardware Power):** The marketing numbers. The total PassMark G3D Mark score the GPU achieves.
 * **Red Cross (Avg. Recommended Requirements):** The average PassMark score required to run the top 5 most popular AAA games of that year.
-* **Orange Circle (Real Perceived Performance):** The reality. The raw power penalized by the engine demand. If this line goes down, you are experiencing less graphical longevity than the previous generation.
+* **Orange Circle (Demand-Adjusted Performance):** The reality. The raw power penalized by the engine demand. If this line goes down, you are experiencing less graphical longevity than the previous generation.
 
 **Bottom Chart: Hardware Economy (Price vs. Value)**
 * **Green Diamond (Inflation-Adjusted Price):** The real cost of the GPU in modern USD.
@@ -30,7 +72,7 @@ The generated dashboard contains two subplots to separate the graphical narrativ
 
 ---
 
-## 🧮 4. The Mathematics (Formulas)
+## 🧮 The Mathematics (Formulas)
 To prevent the chart scales from clashing and to ensure economic accuracy, the script applies the following calculations dynamically:
 
 ### Inflation-Adjusted Price
@@ -40,6 +82,7 @@ $$Price_{Adjusted}=Price_{MSRP}\times\left(\frac{CPI_{2024}}{CPI_{LaunchYear}}\r
 ### Engine Inflation Factor
 Calculates how much heavier AAA games have become compared to the base year (the first year in the dataset).
 $$Factor_{Inflation}=\frac{Demand_{Year}}{Demand_{BaseYear}}$$
+(DemandYear = average PassMark score of recommended GPUs for the top AAA games released in that year)
 
 ### Real Perceived Performance (Adjusted Power)
 The core metric of the project. It penalizes the raw hardware power based on how much heavier the games have become, representing what the user actually *feels* when playing.
@@ -51,7 +94,7 @@ $$Ratio=\frac{Power_{Raw}}{Price_{Adjusted}}$$
 
 ---
 
-## 🧩 5. Processing Pipeline
+## 🧩 Processing Pipeline
 The following flowchart illustrates the autonomous data gathering and transformation lifecycle.
 
 ```mermaid
@@ -84,7 +127,7 @@ sequenceDiagram
 
 * * * * *
 
-🧠 6. Key Insights & Discoveries
+🧠 Key Insights & Discoveries
 --------------------------------
 
 By running the pipeline on the NVIDIA 60-Series (from GTX 960 to RTX 5060), the data reveals a few undeniable market truths:
@@ -92,6 +135,10 @@ By running the pipeline on the NVIDIA 60-Series (from GTX 960 to RTX 5060), the 
 ### The RTX 2060 "Future Tax" Anomaly
 
 Historically, upgrading to a new generation yielded a massive spike in *Performance per Dollar* (e.g., +32% from the 960 to the 1060). However, the RTX 2060 broke this trend. While it delivered a massive ~40% raw performance leap, NVIDIA increased its inflation-adjusted price by ~31.5%. As a result, the *Performance per Dollar* metric stagnated. The data proves that NVIDIA absorbed almost the entire technological leap of Moore's Law as a profit margin, charging a premium for early Ray Tracing and DLSS tech.
+
+<p align="center">
+<img width="70%" alt="{E1B3C047-B661-4C8B-97DD-FE51F9F28566}" src="https://github.com/user-attachments/assets/a0b18b1b-f7ba-4822-8dff-bcdf12082ba0" />
+</p>
 
 ### The Illusion of Cheaper Hardware
 
@@ -103,7 +150,7 @@ If hardware is cheaper and mathematically faster (giving you more raw score per 
 
 * * * * *
 
-🛠 7. Tech Stack
+🛠 Tech Stack
 ----------------
 
 -   **Language:** Python 3
@@ -114,13 +161,13 @@ If hardware is cheaper and mathematically faster (giving you more raw score per 
 
 -   **APIs:** RAWG.io Video Games Database
 
--   **Economics:** CPI (Consumer Price Index library)
+-   **Economics:** CPI-U (Consumer Price Index for All Urban Consumers) data library
 
 -   **Visualization:** Matplotlib
 
 * * * * *
 
-⚙️ 8. Installation & Run
+⚙️ Installation & Run
 ------------------------
 
 ### 🚀 Setup Instructions
